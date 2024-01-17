@@ -26,13 +26,20 @@ data = response.json()["Time Series (Daily)"]
 time_series = [value for (key, value) in data.items()]
 yesterday_price = float(time_series[0]["4. close"])
 b_yesterday = float(time_series[1]["4. close"])
-diff = abs(yesterday_price - b_yesterday)
-diff_percentage = (diff / yesterday_price) * 100
-if diff_percentage > 5:
+diff = yesterday_price - b_yesterday
+emoji = None
+if diff > 0:
+    emoji = "🔺"
+else:
+    emoji = "🔻"
+
+diff_percentage = round((diff / yesterday_price) * 100)
+if abs(diff_percentage) > 0.3:
     news_response = requests.get(url="https://newsapi.org/v2/everything?", params=news_params)
     news_data = news_response.json()
     news_series = [value for (key,value) in news_data.items()][2]
-    formatted_news = [f"Healine: {article["title"]}. \nBrief: {article["description"]}" for article in news_series]
+    formatted_news = [f"{STOCK} {emoji}{diff_percentage}Headline: {article["title"]}. \nBrief: {article["description"]}" for article in news_series]
+    print(formatted_news)
     # for news in formatted_news:
 
 
