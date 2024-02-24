@@ -1,10 +1,16 @@
 import os
 import requests
+from datetime import datetime, timedelta
 
-
+date = datetime.now()
+formatted_date_now = date.strftime("%Y-%m-%d")
+two_weeks_ago_date = date - timedelta(weeks=2)
+formatted_two_weeks_ago_date = two_weeks_ago_date.strftime("%Y-%m-%d")
 class StocksTelegramBot:
     def __init__(self, stock_symbol, company_name):
         self.stock = stock_symbol
+        self.current_date = formatted_date_now
+        self.two_weeks_ago = formatted_two_weeks_ago_date
         self.company_name = company_name
         self.stock_api_key = os.environ.get("STOCK_API_KEY")
         self.news_api_key = os.environ.get("NEWS_API_KEY")
@@ -30,8 +36,8 @@ class StocksTelegramBot:
         news_params = {
             "q": f"{self.company_name}",
             "searchIn": "Title",
-            "from": "2024-02-18",
-            "to": "2024-02-25",
+            "from": f"{self.two_weeks_ago}",
+            "to": f'{self.current_date}',
             "pageSize": 3,
             "language": "en"
         }
@@ -64,4 +70,3 @@ class StocksTelegramBot:
                                f"{article["description"]}") for article in news_series]
             for news in formatted_news:
                 bot_messages = self.telegram_bot_sendtext(news)
-                print(bot_messages)
